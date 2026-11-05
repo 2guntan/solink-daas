@@ -108,10 +108,10 @@ test('parcours complet (PME Ndar, instruction analyste)', async ({ page }) => {
   await expect(page.locator('[data-device-status=ACTIF]')).toHaveCount(5);
 
   // 13. Facture Orange 2 lignes au 1er du mois suivant (horloge simulée)
-  const simNow = new Date(Date.now() + 5 * 86400000);
-  const next1st = new Date(Date.UTC(simNow.getUTCFullYear(), simNow.getUTCMonth() + 1, 1));
-  const days = Math.ceil((next1st.getTime() - simNow.getTime()) / 86400000) + 1;
   await page.goto('/demo/horloge');
+  const [dd, mm, yyyy] = (await page.getByTestId('clock-now').innerText()).slice(0, 10).split('/').map(Number);
+  const simNow = Date.UTC(yyyy, mm - 1, dd);
+  const days = Math.round((Date.UTC(yyyy, mm, 1) - simNow) / 86400000) + 1;
   await page.getByLabel('Nombre de jours').fill(String(days));
   await page.getByTestId('clock-jump').click();
   await expect(page.getByRole('status').filter({ hasText: 'Horloge avancée' })).toBeVisible();
