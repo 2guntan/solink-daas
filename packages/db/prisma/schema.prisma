@@ -1,0 +1,1212 @@
+// SOLINK DaaS — modèle de données (v4 §13 + addendum CLAUDE.md §5)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Enums obligatoires (CLAUDE.md §5) ─────────────────────────
+enum OrderStatus {
+  PANIER
+  DEVIS_EMIS
+  APPROBATION_INTERNE
+  DEVIS_ACCEPTE
+  DOSSIER_EN_COURS
+  PRE_CONTROLE
+  DOSSIER_A_REPRENDRE
+  TRANSMIS_FINANCEUR
+  EN_ANALYSE
+  PIECES_COMPLEMENTAIRES
+  ACCORDE
+  ACCORDE_SOUS_CONDITIONS
+  REFUSE
+  OFFRE_EMISE
+  SIGNATURE_CLIENT
+  CONTRESIGNATURE
+  CONDITIONS_SUSPENSIVES
+  PRET_POUR_ACHAT
+  ACHETE
+  EN_PREPARATION
+  EXPEDIE
+  PV_A_SIGNER
+  DECAISSEMENT_DEMANDE
+  ACTIF
+  FIN_DE_CONTRAT
+  CLOS
+  ANNULE
+  EXPIRE
+  ECHEC
+}
+
+enum DocStatus {
+  A_FOURNIR
+  EN_VERIFICATION
+  VALIDEE
+  A_REPRENDRE
+  EXPIREE
+  NON_APPLICABLE
+}
+
+enum Segment {
+  GRANDE_ENTREPRISE
+  PME
+  INSTITUTION_FINANCIERE
+  PUBLIC
+  ONG
+}
+
+enum Offer {
+  BUREAU_CLOUD
+  POSTE_MOBILE
+  HYBRIDE
+}
+
+enum Range {
+  ESSENTIAL
+  PRO
+  PREMIUM
+}
+
+enum DecisionResult {
+  ACCORDE
+  ACCORDE_SOUS_CONDITIONS
+  REFUSE
+  PIECES_COMPLEMENTAIRES
+  SANS_SUITE
+}
+
+enum ConditionType {
+  DEPOT_MAJORE
+  CAUTION_DIRIGEANT
+  DUREE_MAX
+  MONTANT_MAX
+  PIECE_A_FOURNIR_AVANT_SIGNATURE
+  GARANTIE_TIERS
+  AUTRE
+}
+
+enum ConditionNature {
+  PREALABLE
+  SUSPENSIVE
+}
+
+enum DeviceStatus {
+  COMMANDE
+  EN_TRANSIT
+  EN_STOCK
+  ENROLE
+  LIVRE
+  ACTIF
+  VERROUILLE
+  EN_SAV
+  RETOURNE
+  GRADE
+  RECONDITIONNE
+  REVENDU
+  REDEPLOYE
+  RECYCLE
+}
+
+enum Grade {
+  A
+  B
+  C
+  D
+  E
+}
+
+enum DisbursementStatus {
+  DEMANDEE
+  VALIDEE
+  PAYEE
+  REJETEE
+}
+
+enum InvoiceStatus {
+  EMISE
+  PAYEE
+  PARTIELLE
+  IMPAYEE
+  AVOIR
+}
+
+enum Role {
+  CLIENT_ADMIN
+  CLIENT_SIGNATAIRE
+  CLIENT_FINANCE
+  CLIENT_APPROBATEUR
+  CLIENT_RECEPTION
+  CLIENT_EMPLOYE
+  SOLINK_COMMERCIAL
+  SOLINK_CHARGE_DOSSIER
+  SOLINK_ACHATS
+  SOLINK_LOGISTIQUE
+  SOLINK_MDM
+  SOLINK_SUPPORT
+  SOLINK_FINANCE
+  SOLINK_ADMIN
+  BANQUE_ANALYSTE
+  BANQUE_VALIDEUR
+  BANQUE_TRESORERIE
+  BANQUE_RISK
+  ORANGE_COMMERCIAL
+  ORANGE_FACTURATION
+  REFINANCEUR_LECTURE
+  AUDITEUR
+}
+
+// ───────────────────────── Enums complémentaires ─────────────────────────
+enum OrgType {
+  CLIENT
+  OPERATEUR
+  APPORTEUR
+  FINANCEUR
+  REFINANCEUR
+}
+
+enum SignatureMode {
+  SEUL
+  CONJOINT
+}
+
+enum PersonType {
+  DIRIGEANT
+  SIGNATAIRE
+  BENEFICIAIRE_EFFECTIF
+  GARANT
+}
+
+enum ProductCategory {
+  THIN_CLIENT
+  LAPTOP
+  MAC
+  ECRAN
+  DOCK
+  CASQUE
+  SACOCHE
+}
+
+enum Availability {
+  EN_STOCK
+  SUR_COMMANDE
+}
+
+enum VdiTier {
+  AUCUN
+  STANDARD
+  PERFORMANCE
+}
+
+enum QuoteStatus {
+  EMIS
+  EN_APPROBATION
+  APPROUVE
+  ACCEPTE
+  REFUSE_INTERNE
+  REMPLACE
+  EXPIRE
+}
+
+enum ConsentType {
+  CGU
+  DONNEES_FINANCEMENT
+  BIC
+  ORANGE_HISTORIQUE
+  EXACTITUDE
+  PPE
+}
+
+enum DecisionRoute {
+  AUTO
+  ANALYSTE
+  REFUS_PROPOSE
+}
+
+enum DocOrigin {
+  CHECKLIST
+  DEMANDE_BANQUE
+}
+
+enum ConditionStatus {
+  A_LEVER
+  LEVEE
+}
+
+enum EnvelopeMovementType {
+  RESERVATION
+  CONSOMMATION
+  LIBERATION
+}
+
+enum ContractStatus {
+  EN_SIGNATURE
+  SIGNE
+  ACTIF
+  FIN_DE_CONTRAT
+  CLOS
+  RESILIE
+}
+
+enum CeremonyStatus {
+  EN_COURS
+  TERMINEE
+  EXPIREE
+  ANNULEE
+}
+
+enum SignerRole {
+  CLIENT
+  CO_SIGNATAIRE
+  BANQUE
+}
+
+enum SignerStatus {
+  EN_ATTENTE
+  A_SIGNER
+  SIGNE
+}
+
+enum MandateMethod {
+  PRELEVEMENT_BANCAIRE
+  WAVE
+  ORANGE_MONEY
+}
+
+enum MandateStatus {
+  EN_ATTENTE
+  SIGNE
+  ACTIF
+}
+
+enum PurchaseOrderStatus {
+  EMIS
+  RECU
+}
+
+enum DeliveryStatus {
+  A_PLANIFIER
+  PLANIFIEE
+  PREPAREE
+  EXPEDIEE
+  LIVREE
+}
+
+enum PvStatus {
+  A_SIGNER
+  SIGNE
+}
+
+enum LockOrderStatus {
+  PROPOSE
+  ORDONNE
+  EXECUTE
+  LEVE
+  REFUSE
+}
+
+enum MdmActionType {
+  ENROLER
+  VERROUILLER
+  DEVERROUILLER
+  EFFACER
+}
+
+enum Beneficiary {
+  BANQUE
+  ORANGE
+  SOLINK
+}
+
+enum AllocationComponent {
+  LOYER
+  COMMISSION_APPORTEUR
+  VDI
+  SERVICES_SOLINK
+  ASSURANCE
+}
+
+enum DunningLevel {
+  J1_RAPPEL
+  J7_RELANCE
+  J15_VERROUILLAGE
+  J30_MISE_EN_DEMEURE
+  J60_RESILIATION
+}
+
+enum Channel {
+  SMS
+  WHATSAPP
+  EMAIL
+  PORTAIL
+}
+
+enum TicketStatus {
+  OUVERT
+  EN_COURS
+  RESOLU
+}
+
+enum LeadStatus {
+  NOUVEAU
+  INVITE
+  CONVERTI
+  PERDU
+}
+
+enum EndReason {
+  FIN_NORMALE
+  RENOUVELLEMENT
+  ARRET_ANTICIPE
+  RESILIATION
+  SINISTRE
+}
+
+enum ParamOwner {
+  BANQUE
+  SOLINK
+}
+
+// ───────────────────────── Organisations & utilisateurs ─────────────────────────
+model Organisation {
+  id                String        @id @default(cuid())
+  type              OrgType
+  name              String
+  code              String?       @unique
+  ninea             String?       @unique
+  rccm              String?
+  legalForm         String?
+  segment           Segment?
+  sector            String?
+  naema             String?
+  createdOn         DateTime?
+  capital           Float?
+  address           String?
+  groupName         String?
+  employees         Int?
+  currentBanks      String?
+  kybStatus         String        @default("A_VERIFIER")
+  apporteurId       String?
+  apporteur         Organisation? @relation("Apporteur", fields: [apporteurId], references: [id])
+  apportes          Organisation[] @relation("Apporteur")
+  approvalThreshold Int?
+  jointSignature    Boolean       @default(false)
+  beDeclared        Boolean       @default(true)
+  isDemo            Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+
+  members      Membership[]
+  sites        Site[]
+  persons      Person[]
+  orders       Order[]        @relation("ClientOrders")
+  financedOrders Order[]      @relation("FinancerOrders")
+  broughtOrders Order[]       @relation("ApporteurOrders")
+  envelopes    Envelope[]
+  grids        CoefficientGrid[]
+  packs        Pack[]
+  tickets      Ticket[]
+  leadsCreated Lead[]         @relation("LeadApporteur")
+  refiLinesAsRefi RefiLine[]  @relation("RefiRefinancer")
+  refiLinesAsFin  RefiLine[]  @relation("RefiFinancer")
+  ownedDevices Device[]       @relation("DeviceOwner")
+  contractsFinanced Contract[] @relation("ContractFinancer")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  mobile        String?
+  mobileVerified Boolean     @default(false)
+  firstName     String
+  lastName      String
+  title         String?
+  createdAt     DateTime     @default(now())
+  memberships   Membership[]
+}
+
+model Membership {
+  id             String        @id @default(cuid())
+  userId         String
+  organisationId String
+  roles          Role[]
+  isSignatory    Boolean       @default(false)
+  signatureMode  SignatureMode @default(SEUL)
+  powerDocId     String?
+  siteId         String?
+  createdAt      DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id])
+  organisation   Organisation  @relation(fields: [organisationId], references: [id])
+
+  @@unique([userId, organisationId])
+}
+
+model OtpCode {
+  id         String    @id @default(cuid())
+  identifier String
+  code       String
+  purpose    String    @default("LOGIN")
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([identifier])
+}
+
+model Site {
+  id             String       @id @default(cuid())
+  organisationId String
+  name           String
+  address        String
+  landmark       String?
+  lat            Float?
+  lng            Float?
+  contactName    String?
+  contactPhone   String?
+  contactEmail   String?
+  hours          String?
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  lines          OrderLine[]
+  deliveries     Delivery[]
+  devices        Device[]
+}
+
+model Person {
+  id             String       @id @default(cuid())
+  organisationId String
+  type           PersonType
+  firstName      String
+  lastName       String
+  role           String?
+  idNumber       String?
+  idValidUntil   DateTime?
+  ownershipPct   Int?
+  ppe            Boolean      @default(false)
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+}
+
+// ───────────────────────── Catalogue ─────────────────────────
+model Product {
+  id            String          @id @default(cuid())
+  sku           String          @unique
+  name          String
+  brand         String
+  category      ProductCategory
+  offers        Offer[]
+  range         Range
+  specs         Json
+  keyboard      String          @default("AZERTY")
+  aiReady       Boolean         @default(false)
+  availability  Availability    @default(EN_STOCK)
+  leadTimeDays  Int             @default(5)
+  purchasePrice Int
+  usage         String?
+  supplier      String          @default("Distributeur Démo Dakar")
+  active        Boolean         @default(true)
+  lines         OrderLine[]
+  quoteLines    QuoteLine[]
+  devices       Device[]
+}
+
+model Pack {
+  id             String       @id @default(cuid())
+  organisationId String
+  name           String
+  description    String?
+  items          Json
+  vdiTier        VdiTier      @default(AUCUN)
+  createdAt      DateTime     @default(now())
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+}
+
+// ───────────────────────── Commande, devis ─────────────────────────
+model Order {
+  id               String        @id @default(cuid())
+  ref              String        @unique
+  organisationId   String
+  financerId       String
+  apporteurId      String?
+  status           OrderStatus   @default(PANIER)
+  durationMonths   Int           @default(36)
+  monthlyTtc       Int           @default(0)
+  depositTtc       Int           @default(0)
+  financedAmount   Int           @default(0)
+  priceFrozenUntil DateTime?
+  endReason        EndReason?
+  sampled          Boolean       @default(false)
+  createdById      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  statusChangedAt  DateTime      @default(now())
+  organisation     Organisation  @relation("ClientOrders", fields: [organisationId], references: [id])
+  financer         Organisation  @relation("FinancerOrders", fields: [financerId], references: [id])
+  apporteur        Organisation? @relation("ApporteurOrders", fields: [apporteurId], references: [id])
+  lines            OrderLine[]
+  quotes           Quote[]
+  consents         Consent[]
+  creditFile       CreditFile?
+  contract         Contract?
+  transitions      StatusTransition[]
+  purchaseOrders   PurchaseOrder[]
+  deliveries       Delivery[]
+  devices          Device[]
+  messages         Message[]
+  envelopeMovements EnvelopeMovement[]
+}
+
+model OrderLine {
+  id         String   @id @default(cuid())
+  orderId    String
+  productId  String
+  siteId     String?
+  quantity   Int
+  vdiTier    VdiTier  @default(AUCUN)
+  insurance  Boolean  @default(true)
+  packName   String?
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+  site       Site?    @relation(fields: [siteId], references: [id])
+}
+
+model Quote {
+  id               String      @id @default(cuid())
+  orderId          String
+  ref              String
+  version          Int
+  status           QuoteStatus @default(EMIS)
+  issuedAt         DateTime
+  validUntil       DateTime
+  durationMonths   Int
+  monthlyHt        Int
+  monthlyTva       Int
+  monthlyTtc       Int
+  depositTtc       Int
+  financedAmount   Int
+  totalContractTtc Int
+  seats            Int
+  parameterVersion String
+  pdfFileId        String?
+  approvalRequired Boolean     @default(false)
+  approvedById     String?
+  approvedAt       DateTime?
+  approvalComment  String?
+  acceptedById     String?
+  acceptedAt       DateTime?
+  order            Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  lines            QuoteLine[]
+
+  @@unique([orderId, version])
+}
+
+model QuoteLine {
+  id              String  @id @default(cuid())
+  quoteId         String
+  productId       String
+  label           String
+  quantity        Int
+  siteId          String?
+  siteName        String?
+  vdiTier         VdiTier @default(AUCUN)
+  insurance       Boolean @default(true)
+  components      Json
+  unitMonthlyHt   Int
+  unitMonthlyTtc  Int
+  lineMonthlyTtc  Int
+  unitBase        Int
+  quote           Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product         Product @relation(fields: [productId], references: [id])
+}
+
+model Consent {
+  id          String      @id @default(cuid())
+  orderId     String
+  type        ConsentType
+  textVersion String
+  text        String
+  at          DateTime
+  ip          String?
+  userAgent   String?
+  userId      String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orderId   String
+  authorId  String
+  authorOrg String
+  body      String
+  at        DateTime
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Dossier de crédit ─────────────────────────
+model CreditFile {
+  id               String         @id @default(cuid())
+  orderId          String         @unique
+  version          Int            @default(0)
+  checklistVersion String
+  blocks           Json
+  score            Int?
+  riskClass        String?
+  factors          Json?
+  knockouts        Json?
+  route            DecisionRoute?
+  submittedAt      DateTime?
+  analystId        String?
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  documents        Document[]
+  packages         DfsPackage[]
+  decisions        Decision[]
+}
+
+model Document {
+  id             String     @id @default(cuid())
+  creditFileId   String
+  type           String
+  label          String
+  required       Boolean    @default(true)
+  status         DocStatus  @default(A_FOURNIR)
+  version        Int        @default(0)
+  fileId         String?
+  sha256         String?
+  extraction     Json?
+  docDate        DateTime?
+  validUntil     DateTime?
+  rejectReason   String?
+  naJustification String?
+  verifiedById   String?
+  uploadedById   String?
+  origin         DocOrigin  @default(CHECKLIST)
+  requestMessage String?
+  dueDate        DateTime?
+  updatedAt      DateTime   @updatedAt
+  creditFile     CreditFile @relation(fields: [creditFileId], references: [id], onDelete: Cascade)
+  file           StoredFile? @relation(fields: [fileId], references: [id])
+}
+
+model StoredFile {
+  id        String     @id @default(cuid())
+  path      String
+  name      String
+  mime      String
+  size      Int
+  sha256    String
+  createdAt DateTime   @default(now())
+  documents Document[]
+}
+
+model DfsPackage {
+  id              String     @id @default(cuid())
+  creditFileId    String
+  version         Int
+  packageId       String     @unique
+  manifest        Json
+  manifestSha256  String
+  previousSha256  String?
+  diff            Json?
+  channel         String     @default("PORTAIL")
+  zipFileId       String?
+  transmittedAt   DateTime
+  acknowledgedAt  DateTime?
+  creditFile      CreditFile @relation(fields: [creditFileId], references: [id], onDelete: Cascade)
+
+  @@unique([creditFileId, version])
+}
+
+model Decision {
+  id              String         @id @default(cuid())
+  creditFileId    String
+  financerId      String
+  result          DecisionResult
+  amount          Int?
+  durationMonths  Int?
+  coefficient     String?
+  validUntil      DateTime?
+  deciderId       String?
+  delegationLevel String?
+  internalReason  String?
+  automatic       Boolean        @default(false)
+  ruleVersion     String?
+  idempotencyKey  String?        @unique
+  at              DateTime
+  creditFile      CreditFile     @relation(fields: [creditFileId], references: [id], onDelete: Cascade)
+  conditions      Condition[]
+}
+
+model Condition {
+  id          String          @id @default(cuid())
+  decisionId  String
+  type        ConditionType
+  nature      ConditionNature
+  label       String
+  value       String?
+  status      ConditionStatus @default(A_LEVER)
+  liftedAt    DateTime?
+  liftedById  String?
+  decision    Decision        @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Financeur, enveloppe, grilles, refinanceur ─────────────────────────
+model Envelope {
+  id             String       @id @default(cuid())
+  financerId     String
+  name           String
+  total          Int
+  reserved       Int          @default(0)
+  consumed       Int          @default(0)
+  perClientCap   Int
+  endDate        DateTime
+  alertPcts      Int[]
+  whitelist      String[]
+  active         Boolean      @default(true)
+  financer       Organisation @relation(fields: [financerId], references: [id])
+  movements      EnvelopeMovement[]
+}
+
+model EnvelopeMovement {
+  id         String               @id @default(cuid())
+  envelopeId String
+  orderId    String
+  type       EnvelopeMovementType
+  amount     Int
+  at         DateTime
+  envelope   Envelope             @relation(fields: [envelopeId], references: [id])
+  order      Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model CoefficientGrid {
+  id             String       @id @default(cuid())
+  financerId     String
+  version        String
+  durationMonths Int
+  range          Range?
+  residualPct    Int          @default(0)
+  coefficient    Decimal      @db.Decimal(8, 4)
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  validatedBy    String?
+  financer       Organisation @relation(fields: [financerId], references: [id])
+}
+
+model RefiLine {
+  id            String       @id @default(cuid())
+  refinancerId  String
+  financerId    String
+  amount        Int
+  quotityPct    Int          @default(100)
+  criteria      Json
+  startDate     DateTime
+  endDate       DateTime
+  refinancer    Organisation @relation("RefiRefinancer", fields: [refinancerId], references: [id])
+  financer      Organisation @relation("RefiFinancer", fields: [financerId], references: [id])
+}
+
+// ───────────────────────── Contrat & signature ─────────────────────────
+model Contract {
+  id               String         @id @default(cuid())
+  ref              String         @unique
+  orderId          String         @unique
+  financerId       String
+  status           ContractStatus @default(EN_SIGNATURE)
+  durationMonths   Int
+  monthlyTtc       Int
+  depositTtc       Int
+  financedAmount   Int
+  depositReference String
+  depositReceivedAt DateTime?
+  insuranceIssuedAt DateTime?
+  signedAt         DateTime?
+  startDate        DateTime?
+  endDate          DateTime?
+  refiEligible     Boolean        @default(false)
+  endReason        EndReason?
+  createdAt        DateTime       @default(now())
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  financer         Organisation   @relation("ContractFinancer", fields: [financerId], references: [id])
+  documents        ContractDocument[]
+  ceremonies       SignatureCeremony[]
+  mandate          Mandate?
+  disbursements    Disbursement[]
+  installments     Installment[]
+  invoices         Invoice[]
+  devices          Device[]
+  lockOrders       LockOrder[]
+}
+
+model ContractDocument {
+  id           String   @id @default(cuid())
+  contractId   String
+  kind         String
+  title        String
+  version      Int      @default(1)
+  fileId       String
+  sha256       String
+  signedFileId String?
+  signedSha256 String?
+  createdAt    DateTime @default(now())
+  contract     Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+model SignatureCeremony {
+  id          String         @id @default(cuid())
+  contractId  String
+  providerRef String         @unique
+  status      CeremonyStatus @default(EN_COURS)
+  createdAt   DateTime
+  completedAt DateTime?
+  expiresAt   DateTime
+  proofFileId String?
+  contract    Contract       @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  signers     Signer[]
+}
+
+model Signer {
+  id          String            @id @default(cuid())
+  ceremonyId  String
+  userId      String
+  name        String
+  role        SignerRole
+  order       Int
+  status      SignerStatus      @default(EN_ATTENTE)
+  token       String            @unique
+  signedAt    DateTime?
+  ip          String?
+  ceremony    SignatureCeremony @relation(fields: [ceremonyId], references: [id], onDelete: Cascade)
+}
+
+model Mandate {
+  id          String        @id @default(cuid())
+  contractId  String        @unique
+  method      MandateMethod @default(PRELEVEMENT_BANCAIRE)
+  reference   String
+  iban        String?
+  status      MandateStatus @default(EN_ATTENTE)
+  activatedAt DateTime?
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Achats, livraison, parc ─────────────────────────
+model PurchaseOrder {
+  id         String              @id @default(cuid())
+  ref        String              @unique
+  orderId    String
+  supplier   String
+  status     PurchaseOrderStatus @default(EMIS)
+  amount     Int
+  fileId     String?
+  issuedAt   DateTime
+  receivedAt DateTime?
+  order      Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Delivery {
+  id        String         @id @default(cuid())
+  orderId   String
+  siteId    String
+  slot      DateTime?
+  status    DeliveryStatus @default(A_PLANIFIER)
+  shippedAt DateTime?
+  deliveredAt DateTime?
+  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  site      Site           @relation(fields: [siteId], references: [id])
+  pv        DeliveryReceipt?
+}
+
+model DeliveryReceipt {
+  id          String   @id @default(cuid())
+  deliveryId  String   @unique
+  status      PvStatus @default(A_SIGNER)
+  serials     Json
+  photos      Json
+  reserves    String?
+  blocking    Boolean  @default(false)
+  signedById  String?
+  signedName  String?
+  signedAt    DateTime?
+  fileId      String?
+  sha256      String?
+  delivery    Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+}
+
+model Device {
+  id            String       @id @default(cuid())
+  serial        String       @unique
+  autopilotHash String?
+  productId     String
+  orderId       String?
+  contractId    String?
+  ownerId       String?
+  siteId        String?
+  status        DeviceStatus @default(COMMANDE)
+  grade         Grade?
+  mdmId         String?
+  assignedTo    String?
+  purchasePrice Int          @default(0)
+  lockedAt      DateTime?
+  product       Product      @relation(fields: [productId], references: [id])
+  order         Order?       @relation(fields: [orderId], references: [id])
+  contract      Contract?    @relation(fields: [contractId], references: [id])
+  owner         Organisation? @relation("DeviceOwner", fields: [ownerId], references: [id])
+  site          Site?        @relation(fields: [siteId], references: [id])
+  mdmActions    MdmAction[]
+  tickets       Ticket[]
+  returns       DeviceReturn[]
+}
+
+model MdmAction {
+  id           String        @id @default(cuid())
+  deviceId     String
+  action       MdmActionType
+  lockOrderId  String?
+  executedById String?
+  result       String        @default("OK")
+  at           DateTime
+  device       Device        @relation(fields: [deviceId], references: [id])
+}
+
+model LockOrder {
+  id           String          @id @default(cuid())
+  contractId   String
+  invoiceId    String?
+  status       LockOrderStatus @default(PROPOSE)
+  reason       String
+  proposedAt   DateTime
+  orderedById  String?
+  orderedAt    DateTime?
+  executedById String?
+  executedAt   DateTime?
+  liftedAt     DateTime?
+  contract     Contract        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+model Disbursement {
+  id           String             @id @default(cuid())
+  ref          String             @unique
+  contractId   String
+  amount       Int
+  pieces       Json
+  status       DisbursementStatus @default(DEMANDEE)
+  invoiceFileId String?
+  requestedAt  DateTime
+  validatedAt  DateTime?
+  validatedById String?
+  paidAt       DateTime?
+  paymentRef   String?
+  rejectReason String?
+  contract     Contract           @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Facturation, encaissement, ventilation ─────────────────────────
+model Installment {
+  id         String   @id @default(cuid())
+  contractId String
+  number     Int
+  dueDate    DateTime
+  rentHt     Int
+  rentTva    Int
+  servicesHt Int
+  servicesTva Int
+  totalTtc   Int
+  invoiceId  String?
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, number])
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  ref         String        @unique
+  contractId  String
+  period      String
+  issueDate   DateTime
+  dueDate     DateTime
+  line1Ht     Int
+  line1Tva    Int
+  line1Ttc    Int
+  line2Ht     Int
+  line2Tva    Int
+  line2Ttc    Int
+  totalTtc    Int
+  breakdown   Json
+  paidAmount  Int           @default(0)
+  status      InvoiceStatus @default(EMISE)
+  fileId      String?
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  payments    Payment[]
+  dunnings    Dunning[]
+
+  @@unique([contractId, period])
+}
+
+model Payment {
+  id          String       @id @default(cuid())
+  invoiceId   String
+  amount      Int
+  at          DateTime
+  reference   String       @unique
+  channel     String       @default("VIREMENT")
+  invoice     Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  allocations Allocation[]
+}
+
+model Allocation {
+  id          String              @id @default(cuid())
+  paymentId   String
+  beneficiary Beneficiary
+  component   AllocationComponent
+  amount      Int
+  payment     Payment             @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model Dunning {
+  id        String       @id @default(cuid())
+  invoiceId String
+  level     DunningLevel
+  at        DateTime
+  invoice   Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, level])
+}
+
+// ───────────────────────── Support, fin de contrat, Orange ─────────────────────────
+model Ticket {
+  id             String       @id @default(cuid())
+  ref            String       @unique
+  organisationId String
+  deviceId       String?
+  subject        String
+  description    String
+  status         TicketStatus @default(OUVERT)
+  priority       String       @default("NORMALE")
+  createdById    String
+  createdAt      DateTime
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  device         Device?      @relation(fields: [deviceId], references: [id])
+}
+
+model DeviceReturn {
+  id          String   @id @default(cuid())
+  deviceId    String
+  contractId  String
+  grade       Grade
+  penaltyPct  Int
+  penalty     Int
+  at          DateTime
+  device      Device   @relation(fields: [deviceId], references: [id])
+}
+
+model Lead {
+  id             String       @id @default(cuid())
+  apporteurId    String
+  companyName    String
+  ninea          String?
+  segment        Segment?
+  contactName    String
+  contactEmail   String
+  contactPhone   String?
+  need           String
+  status         LeadStatus   @default(NOUVEAU)
+  organisationId String?
+  createdById    String
+  createdAt      DateTime
+  apporteur      Organisation @relation("LeadApporteur", fields: [apporteurId], references: [id])
+}
+
+// ───────────────────────── Transverse (CLAUDE.md §5) ─────────────────────────
+model StatusTransition {
+  id       String       @id @default(cuid())
+  orderId  String
+  from     OrderStatus?
+  to       OrderStatus
+  actorId  String
+  reason   String?
+  at       DateTime
+  prevHash String?
+  hash     String
+  order    Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, at])
+}
+
+model AuditEvent {
+  id          String   @id @default(cuid())
+  seq         Int      @unique @default(autoincrement())
+  entity      String
+  entityId    String
+  action      String
+  actorId     String
+  payloadHash String
+  payload     Json?
+  prevHash    String?
+  hash        String
+  at          DateTime
+
+  @@index([entity, entityId])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  recipient  String
+  channel    Channel
+  template   String
+  subject    String?
+  body       String
+  link       String?
+  read       Boolean  @default(false)
+  at         DateTime
+
+  @@index([recipient])
+}
+
+model Parameter {
+  id            String     @id @default(cuid())
+  key           String
+  value         Json
+  version       Int
+  effectiveFrom DateTime
+  ownerType     ParamOwner
+  label         String?
+  updatedById   String?
+
+  @@unique([key, version])
+}
+
+model SimClock {
+  id         Int @id @default(1)
+  offsetDays Int @default(0)
+}
+
+model Sequence {
+  name  String @id
+  value Int    @default(0)
+}
+
+model IdempotencyKey {
+  key       String   @id
+  scope     String
+  response  Json
+  createdAt DateTime @default(now())
+}
+
+model WebhookDelivery {
+  id        String   @id @default(cuid())
+  event     String
+  url       String
+  payload   Json
+  signature String
+  timestamp Int
+  status    Int?
+  verified  Boolean  @default(false)
+  at        DateTime
+}
+
+model JobRun {
+  id     String   @id @default(cuid())
+  name   String
+  key    String   @unique
+  at     DateTime
+  result Json?
+}

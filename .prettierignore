@@ -1,0 +1,5 @@
+node_modules
+.next
+storage
+pnpm-lock.yaml
+*.md
