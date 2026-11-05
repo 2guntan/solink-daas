@@ -76,7 +76,9 @@ test('parcours complet (PME Ndar, instruction analyste)', async ({ page }) => {
   await switchTo(page, 'ops@solink.sn');
   await page.goto('/solink/achats');
   await act(page, `bc-${ref}`);
+  await expect(page.getByTestId(`reception-${ref}`)).toBeVisible();
   await act(page, `reception-${ref}`);
+  await expect(page.getByTestId(`reception-${ref}`)).toHaveCount(0);
   await page.goto('/solink/logistique');
   await act(page, `expedier-${ref}`);
   await act(page, 'livrer-Entrepôt Saint-Louis');
