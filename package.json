@@ -1,0 +1,35 @@
+{
+  "name": "solink-daas",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter @solink/web dev",
+    "build": "pnpm --filter @solink/web build",
+    "start": "pnpm --filter @solink/web start",
+    "db:generate": "pnpm --filter @solink/db generate",
+    "db:migrate": "pnpm --filter @solink/db migrate",
+    "db:reset": "pnpm --filter @solink/db reset",
+    "db:seed": "pnpm --filter @solink/db seed",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^3.0.0",
+    "dotenv": "^16.4.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma", "esbuild", "sharp"]
+  }
+}

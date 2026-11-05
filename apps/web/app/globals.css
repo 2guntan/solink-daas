@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-slate-50 text-slate-900 antialiased; }
+table { @apply w-full text-sm; }
+th { @apply text-left font-medium text-slate-500 whitespace-nowrap; }
+a { @apply text-primary; }
+:focus-visible { outline-color: theme('colors.primary.DEFAULT'); }
