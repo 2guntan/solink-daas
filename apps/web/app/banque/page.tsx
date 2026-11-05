@@ -40,6 +40,7 @@ export default async function Page() {
                 <p className="text-[13px] text-neutral-500">Disponible</p>
                 <p className={`mt-1 text-[28px] font-semibold leading-none tracking-tight tabular-nums ${rem <= 10 ? 'text-red-600' : rem <= 20 ? 'text-amber-600' : 'text-neutral-900'}`}>{fcfa(available)}</p>
                 <p className="mt-1 text-xs text-neutral-500">{rem.toFixed(1).replace('.', ',')} % de {fcfa(env.total)}</p>
+                <p className="mt-1 text-xs text-neutral-500">consommé {fcfa(env.consumed)} · réservé {fcfa(env.reserved)}</p>
               </div>
               {rem <= 20 ? <Alert tone="warning">Seuil bas atteint ({env.alertPcts.join(' % / ')} %).</Alert> : null}
               <p className="text-xs text-neutral-500">Plafond par client : {fcfa(env.perClientCap)} · liste blanche : {env.whitelist.length} client(s)</p>
