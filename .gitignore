@@ -8,3 +8,4 @@ playwright-report
 *.tsbuildinfo
 .turbo
 coverage
+blob-report

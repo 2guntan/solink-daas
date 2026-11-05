@@ -25,7 +25,6 @@ async function main() {
   console.log(`▶ Réinitialisation de la base locale ${host}…`);
   await db.$executeRawUnsafe('DROP SCHEMA IF EXISTS public CASCADE');
   await db.$executeRawUnsafe('CREATE SCHEMA public');
-  await db.$executeRawUnsafe('DROP SCHEMA IF EXISTS pgboss CASCADE');
   await db.$disconnect();
   execSync('prisma migrate deploy', { stdio: 'inherit' });
   execSync('tsx prisma/seed.ts', { stdio: 'inherit' });

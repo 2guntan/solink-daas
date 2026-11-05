@@ -13,7 +13,7 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "pnpm -r --parallel typecheck",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "pnpm db:reset && playwright test",
     "format": "prettier --write ."
   },
   "devDependencies": {
@@ -30,6 +30,12 @@
     "dotenv": "^16.4.7"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma", "esbuild", "sharp"]
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild",
+      "sharp"
+    ]
   }
 }

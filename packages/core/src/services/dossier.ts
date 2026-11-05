@@ -71,7 +71,7 @@ export async function requestFinancing(
     declarations: {},
   };
   // Réutilisation des agrégats financiers d'un dossier précédent (P4 « saisir une fois »).
-  const prev = await ctx.db.creditFile.findFirst({ where: { order: { organisationId: org.id } }, orderBy: { submittedAt: 'desc' } });
+  const prev = await ctx.db.creditFile.findFirst({ where: { order: { organisationId: org.id }, submittedAt: { not: null } }, orderBy: { submittedAt: 'desc' } });
   const prevBlocks = (prev?.blocks ?? {}) as DossierBlocks;
   if (prevBlocks.finances?.years?.length) blocks.finances = { years: prevBlocks.finances.years, commitments: prevBlocks.finances.commitments };
 
