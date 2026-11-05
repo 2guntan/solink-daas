@@ -24,7 +24,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const prealables = o.creditFile?.decisions[0]?.conditions.filter((x) => x.nature === 'PREALABLE') ?? [];
   return (
     <div className="flex flex-col gap-4">
-      <Link href={`/client/commandes/${o.id}`} className="text-sm">← Commande {o.ref}</Link>
+      <Link href={`/client/commandes/${o.id}`} className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← Commande {o.ref}</Link>
       <PageHeader title={`Offre de financement et signature — ${c.ref}`} />
       <Card>
         <CardHeader><CardTitle>Récapitulatif</CardTitle></CardHeader>

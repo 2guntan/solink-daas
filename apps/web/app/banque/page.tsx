@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@solink/db';
 import { date, fcfa, now, remainingPct } from '@solink/core';
-import { Alert, Card, CardContent, CardHeader, CardTitle, PageHeader, Progress, Stat } from '@solink/ui';
+import { Alert, Card, CardContent, CardHeader, CardTitle, PageHeader, Stat } from '@solink/ui';
 import { requireActor } from '@/lib/session';
 import { EnvelopeChart } from '@/components/charts';
 import { OrderStatusBadge } from '@/components/status';
@@ -34,13 +34,15 @@ export default async function Page() {
       {env ? (
         <Card data-testid="enveloppe">
           <CardHeader><CardTitle>{env.name} — échéance {date(env.endDate)}</CardTitle></CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col gap-2 text-sm">
-              <p>Total {fcfa(env.total)} · consommé {fcfa(env.consumed)} · réservé {fcfa(env.reserved)}</p>
-              <p>Disponible <strong>{fcfa(available)}</strong> ({rem.toFixed(1).replace('.', ',')} %)</p>
-              <Progress value={100 - rem} tone={rem <= 10 ? 'danger' : rem <= 20 ? 'warning' : 'primary'} />
+          <CardContent className="grid gap-6 md:grid-cols-[280px_1fr] md:gap-10">
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className="text-[13px] text-neutral-500">Disponible</p>
+                <p className={`mt-1 text-[28px] font-semibold leading-none tracking-tight tabular-nums ${rem <= 10 ? 'text-red-600' : rem <= 20 ? 'text-amber-600' : 'text-neutral-900'}`}>{fcfa(available)}</p>
+                <p className="mt-1 text-xs text-neutral-500">{rem.toFixed(1).replace('.', ',')} % de {fcfa(env.total)}</p>
+              </div>
               {rem <= 20 ? <Alert tone="warning">Seuil bas atteint ({env.alertPcts.join(' % / ')} %).</Alert> : null}
-              <p className="text-xs text-slate-500">Plafond par client : {fcfa(env.perClientCap)} · liste blanche : {env.whitelist.length} client(s)</p>
+              <p className="text-xs text-neutral-500">Plafond par client : {fcfa(env.perClientCap)} · liste blanche : {env.whitelist.length} client(s)</p>
             </div>
             <EnvelopeChart consumed={env.consumed} reserved={env.reserved} available={available} />
           </CardContent>
@@ -48,9 +50,19 @@ export default async function Page() {
       ) : null}
       <Card>
         <CardHeader><CardTitle>Dossiers en cours</CardTitle></CardHeader>
-        <CardContent className="flex flex-col divide-y">
-          {orders.map((o) => <div key={o.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"><Link href={`/banque/dossiers/${o.id}`}>{o.ref} — {o.organisation.name}</Link><span className="flex items-center gap-2"><OrderStatusBadge status={o.status} internal /> <Sla status={o.status} since={o.statusChangedAt} now={at} /> {fcfa(o.financedAmount)}</span></div>)}
-          {orders.length === 0 ? <p className="text-sm text-slate-500">Aucun dossier en attente.</p> : null}
+        <CardContent className="flex flex-col divide-y divide-neutral-100">
+          {orders.map((o) => (
+            <Link key={o.id} href={`/banque/dossiers/${o.id}`} className="-mx-3 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm text-neutral-900 no-underline transition-colors hover:bg-neutral-50 hover:no-underline">
+              <span>
+                <span className="font-medium">{o.ref}</span>
+                <span className="text-neutral-500"> — {o.organisation.name}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <OrderStatusBadge status={o.status} internal /> <Sla status={o.status} since={o.statusChangedAt} now={at} /> <span className="w-32 text-right font-medium tabular-nums">{fcfa(o.financedAmount)}</span>
+              </span>
+            </Link>
+          ))}
+          {orders.length === 0 ? <p className="py-2 text-sm text-neutral-500">Aucun dossier en attente.</p> : null}
         </CardContent>
       </Card>
     </div>

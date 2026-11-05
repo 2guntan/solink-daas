@@ -7,5 +7,5 @@ export default async function Page({ params }: { params: Promise<{ sku: string }
   const { sku } = await params;
   const p = await prisma.product.findUniqueOrThrow({ where: { sku } });
   const pr = await getParams(prisma);
-  return <div><Link href="/orange/configurateur" className="text-sm">← Catalogue</Link><ProductHeader sku={sku} /><Configurator sku={sku} isThin={p.category === 'THIN_CLIENT'} durations={pr.durees_autorisees} accessories={[]} financer="Banque Pilote (démo)" /></div>;
+  return <div><Link href="/orange/configurateur" className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← Catalogue</Link><ProductHeader sku={sku} /><Configurator sku={sku} isThin={p.category === 'THIN_CLIENT'} durations={pr.durees_autorisees} accessories={[]} financer="Banque Pilote (démo)" /></div>;
 }

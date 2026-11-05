@@ -22,7 +22,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-3">
           {deposits.length === 0 ? <EmptyState title="Aucun dépôt en attente" /> : null}
           {deposits.map((c) => (
-            <div key={c.id} className="flex flex-col gap-2 rounded border p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div key={c.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm">{c.order.organisation.name} — {c.ref} — <strong>{fcfa(c.depositTtc)}</strong> — réf. {c.depositReference}</span>
               <ActionForm action={confirmDepositSim} hidden={{ contractId: c.id }} submit="Confirmer la réception du dépôt" size="sm" testId={`depot-${c.ref}`} />
             </div>
@@ -34,7 +34,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-3">
           {disb.length === 0 ? <EmptyState title="Aucun décaissement en attente" /> : null}
           {disb.map((d) => (
-            <div key={d.id} className="flex flex-col gap-2 rounded border p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div key={d.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm">{d.ref} — contrat {d.contract.ref} — <strong>{fcfa(d.amount)}</strong> — {d.status}</span>
               <ActionForm action={payDisbursementSim} hidden={{ id: d.id }} submit="Confirmer le virement à SOLINK" size="sm" testId={`payer-${d.ref}`} />
             </div>
@@ -46,7 +46,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-3">
           {invoices.length === 0 ? <EmptyState title="Aucune facture à encaisser" /> : null}
           {invoices.map((i) => (
-            <div key={i.id} className="flex flex-col gap-2 rounded border p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div key={i.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm">{i.contract.order.organisation.name} — {i.ref} — échéance {date(i.dueDate)} — reste <strong>{fcfa(i.totalTtc - i.paidAmount)}</strong> — {i.status}</span>
               <ActionForm action={collectInvoiceSim} hidden={{ invoiceId: i.id }} submit="Encaisser" size="sm" inline testId={`encaisser-${i.ref}`}>
                 <Input name="amount" defaultValue={i.totalTtc - i.paidAmount} aria-label="Montant encaissé" className="w-40" />

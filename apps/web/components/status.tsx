@@ -1,4 +1,4 @@
-import { Badge } from '@solink/ui';
+import { Badge, cn } from '@solink/ui';
 import { STATUS_INFO, TIMELINE_STEPS, DOC_STATUS_LABEL, dateTime } from '@solink/core';
 import type { OrderStatus } from '@solink/db';
 
@@ -21,7 +21,7 @@ const TONE: Partial<Record<OrderStatus, 'success' | 'warning' | 'danger' | 'info
 
 export function OrderStatusBadge({ status, internal }: { status: OrderStatus; internal?: boolean }) {
   return (
-    <Badge tone={TONE[status] ?? 'neutral'} data-status={status}>
+    <Badge tone={TONE[status] ?? 'neutral'} data-status={status} className={internal ? 'font-mono text-[10px] tracking-wide' : undefined}>
       {internal ? status.replace(/_/g, ' ') : STATUS_INFO[status].label}
     </Badge>
   );
@@ -39,24 +39,55 @@ export function DocStatusBadge({ status }: { status: string }) {
   return <Badge tone={DOC_TONE[status]} data-doc-status={status}>{DOC_STATUS_LABEL[status]}</Badge>;
 }
 
-/** Frise de statut de la commande (9 étapes, v4 §4.1). */
-export function Timeline({ status, transitions }: { status: OrderStatus; transitions?: { to: string; at: Date }[] }) {
+/** Frise de statut de la commande (9 étapes, v4 §4.1) : points reliés par un filet, étape courante en encre. */
+export function Timeline({ status, transitions, compact }: { status: OrderStatus; transitions?: { to: string; at: Date }[]; compact?: boolean }) {
   const step = STATUS_INFO[status].step;
   const terminal = step === 0;
+  const last = transitions?.length ? transitions[transitions.length - 1].at : null;
   return (
-    <ol className="flex flex-wrap gap-x-1 gap-y-2 text-xs" aria-label="Frise de statut">
-      {TIMELINE_STEPS.map((label, i) => {
-        const n = i + 1;
-        const done = !terminal && n < step;
-        const cur = !terminal && n === step;
-        return (
-          <li key={label} className={`flex items-center gap-1 rounded-full px-2 py-1 ${done ? 'bg-emerald-50 text-emerald-700' : cur ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'}`} aria-current={cur ? 'step' : undefined}>
-            <span className="font-semibold">{n}</span> {label}
-          </li>
-        );
-      })}
-      {terminal ? <li className="rounded-full bg-red-50 px-2 py-1 text-red-700">{STATUS_INFO[status].label}</li> : null}
-      {transitions?.length ? <li className="w-full text-slate-400">Dernière mise à jour : {dateTime(transitions[transitions.length - 1].at)}</li> : null}
-    </ol>
+    <div className="flex flex-col gap-3">
+      <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
+        <ol className={cn('grid min-w-[640px]', compact ? 'gap-0' : 'gap-0')} style={{ gridTemplateColumns: `repeat(${TIMELINE_STEPS.length}, minmax(0, 1fr))` }} aria-label="Frise de statut">
+          {TIMELINE_STEPS.map((label, i) => {
+            const n = i + 1;
+            const done = !terminal && n < step;
+            const cur = !terminal && n === step;
+            return (
+              <li key={label} className="relative flex flex-col items-center gap-2 text-center" aria-current={cur ? 'step' : undefined}>
+                {i > 0 ? <span aria-hidden className={cn('absolute left-0 right-1/2 top-[7px] h-px', done || cur ? 'bg-neutral-900' : 'bg-neutral-200')} /> : null}
+                {i < TIMELINE_STEPS.length - 1 ? <span aria-hidden className={cn('absolute left-1/2 right-0 top-[7px] h-px', done ? 'bg-neutral-900' : 'bg-neutral-200')} /> : null}
+                <span
+                  aria-hidden
+                  className={cn(
+                    'relative z-10 flex h-[15px] w-[15px] items-center justify-center rounded-full border transition-colors',
+                    done && 'border-neutral-900 bg-neutral-900 text-white',
+                    cur && 'border-neutral-900 bg-white ring-4 ring-neutral-900/10',
+                    !done && !cur && 'border-neutral-300 bg-white',
+                  )}
+                >
+                  {done ? (
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1.5 5.5 4 8l4.5-6" />
+                    </svg>
+                  ) : cur ? (
+                    <span className="h-[7px] w-[7px] rounded-full bg-neutral-900" />
+                  ) : null}
+                </span>
+                <span className={cn('px-1 text-[11px] leading-tight', cur ? 'font-semibold text-neutral-900' : done ? 'text-neutral-700' : 'text-neutral-400')}>
+                  <span className="sr-only">{n}. </span>
+                  {label}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+      {terminal || last ? (
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+          {terminal ? <Badge tone="danger">{STATUS_INFO[status].label}</Badge> : null}
+          {last ? <span>Dernière mise à jour : {dateTime(last)}</span> : null}
+        </div>
+      ) : null}
+    </div>
   );
 }

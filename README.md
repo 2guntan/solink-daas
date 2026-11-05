@@ -83,7 +83,7 @@ apps/web/              Next.js 15 (App Router) — 5 portails + API
 packages/core          machine à états, prix, scoring, enveloppe, DFS, échéancier, ventilation, relances, PDF, services
 packages/adapters      interfaces + implémentations simulées (Messaging, ESign, Ocr, BIC, OrangeHistory, SFTP, Payments, OrangeBilling, Distributor, Mdm, Llm, FileStore)
 packages/db            schema.prisma, migrations, seed.ts, script de reset
-packages/ui            composants Tailwind façon shadcn/ui, thème (couleur SOLINK dans packages/ui/theme.ts)
+packages/ui            composants Tailwind façon shadcn/ui, thème minimaliste (encre + gris, Inter embarquée) dans packages/ui/theme.ts
 e2e/                   scénarios Playwright
 ```
 

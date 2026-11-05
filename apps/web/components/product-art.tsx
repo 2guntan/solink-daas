@@ -1,6 +1,8 @@
-/** Illustrations SVG génériques (pas de photos de marques). */
-export function ProductArt({ category, className = 'h-20 w-full' }: { category: string; className?: string }) {
-  const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 3, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+import { cn } from '@solink/ui';
+
+/** Illustrations SVG génériques au trait (pas de photos de marques). */
+export function ProductArt({ category, className = 'h-20 w-full', tile = false }: { category: string; className?: string; tile?: boolean }) {
+  const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 2.25, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   const shapes: Record<string, React.ReactNode> = {
     THIN_CLIENT: (<><rect x="38" y="10" width="24" height="60" rx="4" {...common} /><circle cx="50" cy="20" r="3" {...common} /><rect x="30" y="70" width="40" height="6" rx="2" {...common} /></>),
     LAPTOP: (<><rect x="22" y="14" width="56" height="38" rx="4" {...common} /><path d="M12 62h76l-6 8H18z" {...common} /></>),
@@ -10,9 +12,11 @@ export function ProductArt({ category, className = 'h-20 w-full' }: { category: 
     CASQUE: (<><path d="M22 52V42a28 28 0 0156 0v10" {...common} /><rect x="16" y="48" width="12" height="20" rx="4" {...common} /><rect x="72" y="48" width="12" height="20" rx="4" {...common} /></>),
     SACOCHE: (<><rect x="18" y="26" width="64" height="44" rx="6" {...common} /><path d="M38 26v-8h24v8M18 44h64" {...common} /></>),
   };
-  return (
-    <svg viewBox="0 0 100 80" className={`${className} text-primary/70`} role="img" aria-label="Illustration générique">
+  const svg = (
+    <svg viewBox="0 0 100 80" className={cn(tile ? 'h-full w-full max-h-24' : className, 'text-neutral-800')} role="img" aria-label="Illustration générique">
       {shapes[category] ?? shapes.LAPTOP}
     </svg>
   );
+  if (!tile) return svg;
+  return <div className={cn('flex items-center justify-center rounded-xl bg-neutral-50 p-6', className)}>{svg}</div>;
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { EmptyState, Input, Select, Button } from '@solink/ui';
+import { EmptyState, Input, Select, Button, buttonVariants, cn } from '@solink/ui';
 
 /** Liste standard : recherche, filtres, tri, état vide, pagination (CLAUDE.md §10). Filtrage en mémoire (volumes de démo). */
 export interface Column<T> {
@@ -20,6 +20,14 @@ export interface Filter<T> {
 
 type SP = Record<string, string | string[] | undefined>;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? '';
+
+function SortIcon({ dir }: { dir: 0 | 1 | -1 }) {
+  return (
+    <svg aria-hidden width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className={cn('ml-1 inline-block align-[-1px]', dir === 0 ? 'text-neutral-300' : 'text-neutral-900')}>
+      {dir === -1 ? <path d="M3 5l3 3 3-3" /> : dir === 1 ? <path d="M3 7l3-3 3 3" /> : <path d="M3 4.5l3-2.5 3 2.5M3 7.5l3 2.5 3-2.5" />}
+    </svg>
+  );
+}
 
 export function ListView<T>({
   rows,
@@ -70,13 +78,22 @@ export function ListView<T>({
     return `${basePath}${s ? `?${s}` : ''}`;
   };
   const hasFilters = !!search || filters.length > 0;
+  const filtered = q || filters.some((f) => one(searchParams[f.key]));
   return (
     <div className="flex flex-col gap-3" data-testid={testId}>
       {hasFilters ? (
-        <form className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end" action={basePath}>
-          {search ? <Input name="q" defaultValue={one(searchParams.q)} placeholder="Rechercher…" aria-label="Rechercher" className="sm:max-w-xs" /> : null}
+        <form className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center" action={basePath}>
+          {search ? (
+            <div className="relative sm:w-64">
+              <svg aria-hidden width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <Input name="q" defaultValue={one(searchParams.q)} placeholder="Rechercher…" aria-label="Rechercher" className="pl-9" />
+            </div>
+          ) : null}
           {filters.map((f) => (
-            <Select key={f.key} name={f.key} defaultValue={one(searchParams[f.key])} aria-label={f.label} className="sm:max-w-[220px]">
+            <Select key={f.key} name={f.key} defaultValue={one(searchParams[f.key])} aria-label={f.label} className="sm:w-auto sm:min-w-[160px] sm:max-w-[220px]">
               <option value="">{f.label} : tous</option>
               {f.options.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -88,25 +105,26 @@ export function ListView<T>({
           <Button type="submit" variant="secondary">
             Filtrer
           </Button>
-          {(q || filters.some((f) => one(searchParams[f.key]))) && (
-            <Link href={basePath} className="text-sm">
+          {filtered ? (
+            <Link href={basePath} className={buttonVariants({ variant: 'ghost' })}>
               Réinitialiser
             </Link>
-          )}
+          ) : null}
         </form>
       ) : null}
       {total === 0 ? (
         <EmptyState title={empty?.title ?? 'Aucun élément'} description={empty?.description ?? (q ? 'Aucun résultat pour cette recherche.' : undefined)} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-neutral-200/80 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
           <table>
-            <thead className="bg-slate-50">
+            <thead>
               <tr>
                 {columns.map((c) => (
-                  <th key={c.key} className={`px-3 py-2 ${c.className ?? ''}`} scope="col">
+                  <th key={c.key} className={cn('border-b border-neutral-200 bg-neutral-50/60 px-4 py-2.5 text-xs font-medium text-neutral-500 first:pl-5 last:pr-5', c.className)} scope="col">
                     {c.sort ? (
-                      <Link href={qs({ tri: c.key, ordre: sort === c.key && dir === 1 ? 'desc' : 'asc', page: '' })} className="text-slate-600 hover:text-slate-900">
-                        {c.label} {sort === c.key ? (dir === 1 ? '▲' : '▼') : ''}
+                      <Link href={qs({ tri: c.key, ordre: sort === c.key && dir === 1 ? 'desc' : 'asc', page: '' })} className="text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">
+                        {c.label}
+                        <SortIcon dir={sort === c.key ? (dir === 1 ? 1 : -1) : 0} />
                       </Link>
                     ) : (
                       c.label
@@ -115,11 +133,11 @@ export function ListView<T>({
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {slice.map((r) => (
-                <tr key={rowKey(r)} className="hover:bg-slate-50">
+                <tr key={rowKey(r)} className="border-t border-neutral-100 transition-colors first:border-t-0 hover:bg-neutral-50/70">
                   {columns.map((c) => (
-                    <td key={c.key} className={`px-3 py-2 align-top ${c.className ?? ''}`}>
+                    <td key={c.key} className={cn('px-4 py-3 align-top first:pl-5 last:pr-5', c.className)}>
                       {c.render(r)}
                     </td>
                   ))}
@@ -130,17 +148,25 @@ export function ListView<T>({
         </div>
       )}
       {pages > 1 ? (
-        <nav className="flex items-center justify-between text-sm" aria-label="Pagination">
-          <span className="text-slate-500">
-            {total} élément(s) — page {page}/{pages}
+        <nav className="flex items-center justify-between text-[13px]" aria-label="Pagination">
+          <span className="text-neutral-500">
+            {total} élément(s) · page {page}/{pages}
           </span>
-          <div className="flex gap-2">
-            {page > 1 ? <Link href={qs({ page: String(page - 1) })}>← Précédent</Link> : null}
-            {page < pages ? <Link href={qs({ page: String(page + 1) })}>Suivant →</Link> : null}
+          <div className="flex gap-1.5">
+            {page > 1 ? (
+              <Link href={qs({ page: String(page - 1) })} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                ← Précédent
+              </Link>
+            ) : null}
+            {page < pages ? (
+              <Link href={qs({ page: String(page + 1) })} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                Suivant →
+              </Link>
+            ) : null}
           </div>
         </nav>
       ) : total ? (
-        <p className="text-xs text-slate-400">{total} élément(s)</p>
+        <p className="px-1 text-xs text-neutral-400">{total} élément(s)</p>
       ) : null}
     </div>
   );

@@ -24,7 +24,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-3">
           {orders.length === 0 ? <EmptyState title="Aucune commande prête pour achat" /> : null}
           {orders.map((o) => (
-            <div key={o.id} className="flex flex-col gap-2 rounded border p-3 md:flex-row md:items-center md:justify-between" data-testid={`achat-${o.ref}`}>
+            <div key={o.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 md:flex-row md:items-center md:justify-between" data-testid={`achat-${o.ref}`}>
               <div className="text-sm"><Link href={`/solink/commandes/${o.id}`}>{o.ref}</Link> — {o.organisation.name} <OrderStatusBadge status={o.status} internal /><br /><span className="text-xs text-slate-500">{o.lines.map((l) => `${l.quantity} × ${l.product.sku}`).join(', ')}</span></div>
               <ActionForm action={createPoAction} hidden={{ orderId: o.id }} submit="Émettre le bon de commande distributeur" size="sm" testId={`bc-${o.ref}`} />
             </div>
@@ -36,7 +36,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-2">
           {pos.length === 0 ? <EmptyState title="Aucun bon de commande" /> : null}
           {pos.map((p) => (
-            <div key={p.id} className="flex flex-col gap-2 rounded border p-3 md:flex-row md:items-center md:justify-between">
+            <div key={p.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 md:flex-row md:items-center md:justify-between">
               <span className="text-sm">{p.ref} — {p.order.organisation.name} — {fcfa(p.amount)} HT — émis le {date(p.issuedAt)} {p.fileId ? <a href={`/api/files/${p.fileId}`} target="_blank">PDF</a> : null} <Badge tone={p.status === 'RECU' ? 'success' : 'warning'}>{p.status === 'RECU' ? `reçu le ${date(p.receivedAt)}` : 'en attente'}</Badge></span>
               {p.status === 'EMIS' ? <ActionForm action={receivePoAction} hidden={{ poId: p.id }} submit="Simuler la réception" size="sm" variant="secondary" testId={`reception-${p.order.ref}`} /> : null}
             </div>

@@ -30,7 +30,7 @@ export default async function Page() {
               </ActionForm>
             ) : null}
             {d.pv ? (
-              <div className="rounded border p-3 text-sm">
+              <div className="rounded-xl border border-neutral-200/80 bg-white p-4 text-sm">
                 <p className="font-medium">PV de livraison — {(d.pv.serials as unknown[]).length} équipement(s), {(d.pv.photos as unknown[]).length} photo(s)</p>
                 <ul className="mt-1 max-h-32 overflow-auto font-mono text-xs">{(d.pv.serials as { serial: string; label: string }[]).map((s) => <li key={s.serial}>{s.serial} — {s.label}</li>)}</ul>
                 {d.pv.status === 'SIGNE' ? (

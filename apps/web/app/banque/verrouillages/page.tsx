@@ -27,7 +27,7 @@ export default async function Page() {
         <CardContent className="flex flex-col gap-2">
           {locks.length === 0 ? <EmptyState title="Aucune proposition" /> : null}
           {locks.map((l) => (
-            <div key={l.id} className="flex flex-col gap-2 rounded border p-3 text-sm md:flex-row md:items-center md:justify-between">
+            <div key={l.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 text-sm md:flex-row md:items-center md:justify-between">
               <span>{l.contract.order.organisation.name} — {l.contract.ref} — {l.reason} — proposé {dateTime(l.proposedAt)} <Badge tone={l.status === 'LEVE' ? 'success' : l.status === 'EXECUTE' ? 'danger' : 'warning'}>{l.status}</Badge></span>
               {canLock && l.status === 'PROPOSE' ? (
                 <div className="flex flex-wrap gap-2">

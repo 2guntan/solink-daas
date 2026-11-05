@@ -12,7 +12,14 @@ function Submit({ children, variant, size, className, disabled, testId }: { chil
   const { pending } = useFormStatus();
   return (
     <Button type="submit" variant={variant} size={size} className={className} disabled={pending || disabled} aria-busy={pending} data-testid={testId}>
-      {pending ? 'Traitement…' : children}
+      {pending ? (
+        <>
+          <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-current border-t-transparent opacity-70" />
+          Traitement…
+        </>
+      ) : (
+        children
+      )}
     </Button>
   );
 }
@@ -69,14 +76,14 @@ export function ActionForm({
         </Button>
       ) : null}
       {needsConfirm && confirming ? (
-        <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3" role="dialog" aria-label="Confirmation">
-          <p className="text-sm font-medium text-amber-900">{confirm ?? 'Confirmez-vous cette action ?'}</p>
+        <div className="flex animate-fade-up flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-pop" role="dialog" aria-label="Confirmation">
+          <p className="text-sm font-semibold text-neutral-900">{confirm ?? 'Confirmez-vous cette action ?'}</p>
           {reason ? <Textarea name="reason" required minLength={3} placeholder={reason} aria-label="Motif" /> : null}
           <div className="flex gap-2">
             <Submit variant={variant === 'destructive' ? 'destructive' : 'default'} size={size} testId={testId ? `${testId}-confirmer` : undefined}>
               Confirmer
             </Submit>
-            <Button type="button" variant="outline" size={size} onClick={() => setConfirming(false)}>
+            <Button type="button" variant="ghost" size={size} onClick={() => setConfirming(false)}>
               Annuler
             </Button>
           </div>
@@ -88,12 +95,12 @@ export function ActionForm({
         </Submit>
       ) : null}
       {state?.error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-[13px] text-red-600">
           {state.error}
         </p>
       ) : null}
       {state?.ok && state.message ? (
-        <p role="status" className="text-sm text-emerald-700">
+        <p role="status" className="text-[13px] text-emerald-700">
           {state.message}
         </p>
       ) : null}

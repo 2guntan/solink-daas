@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const canReview = actor.roles.some((r) => ['SOLINK_CHARGE_DOSSIER', 'SOLINK_ADMIN'].includes(r));
   return (
     <div className="flex flex-col gap-4">
-      <Link href="/solink" className="text-sm">← Pipeline</Link>
+      <Link href="/solink" className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← Pipeline</Link>
       <PageHeader title={`${o.ref} — ${o.organisation.name}`} description={<span className="flex flex-wrap items-center gap-2"><OrderStatusBadge status={o.status} internal /> {o.apporteur ? `apporteur ${o.apporteur.name}` : 'self-service'}</span>} />
       <Card><CardContent className="pt-4"><Timeline status={o.status} transitions={o.transitions} /></CardContent></Card>
       <Card>
@@ -53,7 +53,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <Card>
         <CardHeader><CardTitle>Messagerie client</CardTitle></CardHeader>
         <CardContent className="flex flex-col gap-2">
-          {o.messages.map((m) => <p key={m.id} className="rounded bg-slate-50 p-2 text-sm">{m.authorOrg === 'CLIENT' ? 'Client' : 'SOLINK'} : {m.body}</p>)}
+          {o.messages.length === 0 ? <p className="text-sm text-neutral-500">Aucun message.</p> : null}
+          {o.messages.map((m) => (
+            <div key={m.id} className={`flex flex-col gap-1 ${m.authorOrg === 'CLIENT' ? 'items-start' : 'items-end'}`}>
+              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.authorOrg === 'CLIENT' ? 'rounded-bl-md bg-neutral-100 text-neutral-900' : 'rounded-br-md bg-neutral-900 text-white'}`}>{m.body}</div>
+              <span className="px-1 text-[11px] text-neutral-400">{m.authorOrg === 'CLIENT' ? 'Client' : 'SOLINK'}</span>
+            </div>
+          ))}
           <ActionForm action={messageAction} hidden={{ orderId: o.id }} submit="Envoyer" size="sm"><Textarea name="body" required aria-label="Message" /></ActionForm>
         </CardContent>
       </Card>

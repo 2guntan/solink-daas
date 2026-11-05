@@ -1,11 +1,37 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Badge } from '@solink/ui';
+import { DemoBadge, Select, Input, cn } from '@solink/ui';
 
 type Res = { perSeatTtc: number; totalTtc: number; contractTtc: number; detail: { loyerMaterielHt: number; servicesSolinkHt: number; servicesOrangeHt: number; assuranceHt: number; tva: number } };
 
 const fcfa = (n: number) => `${Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} FCFA`;
+
+function Option({ checked, children, onChange, name, value }: { checked: boolean; children: React.ReactNode; onChange: () => void; name: string; value: string }) {
+  return (
+    <label
+      className={cn(
+        'flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2.5 text-sm transition-all duration-150 ease-apple',
+        checked ? 'border-neutral-900 bg-neutral-900 font-medium text-white' : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300',
+      )}
+    >
+      <input type="radio" name={name} value={value} checked={checked} onChange={onChange} className="sr-only" />
+      {children}
+    </label>
+  );
+}
+
+function Check({ checked, onChange, name, value, label, hint }: { checked: boolean; onChange: (v: boolean) => void; name: string; value?: string; label: string; hint?: string }) {
+  return (
+    <label className={cn('flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition-colors', checked ? 'border-neutral-900/60 bg-white' : 'border-neutral-200 bg-white hover:border-neutral-300')}>
+      <input type="checkbox" name={name} value={value} checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5" />
+      <span className="flex flex-col">
+        <span className="font-medium text-neutral-900">{label}</span>
+        {hint ? <span className="text-xs text-neutral-500">{hint}</span> : null}
+      </span>
+    </label>
+  );
+}
 
 /** Bloc « Votre mensualité » toujours visible (E08) — calcul serveur, cache client. */
 export function Configurator({
@@ -46,70 +72,79 @@ export function Configurator({
       .catch(() => {});
     return () => ctl.abort();
   }, [key]);
+  const section = 'text-[13px] font-medium text-neutral-700';
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-      <div className="flex flex-col gap-4">
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-medium">Durée</legend>
-          <div className="flex gap-2">
+    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+      <div className="flex flex-col gap-7">
+        <fieldset className="flex flex-col gap-2.5">
+          <legend className={section}>Durée</legend>
+          <div className="grid grid-cols-2 gap-2 sm:flex">
             {durations.map((d) => (
-              <label key={d} className={`cursor-pointer rounded border px-4 py-2 text-sm ${d === duree ? 'border-primary bg-primary/5 font-semibold' : 'border-slate-300'}`}>
-                <input type="radio" name="duration" value={d} checked={d === duree} onChange={() => setDuree(d)} className="sr-only" />
+              <Option key={d} name="duration" value={String(d)} checked={d === duree} onChange={() => setDuree(d)}>
                 {d} mois
-              </label>
+              </Option>
             ))}
           </div>
         </fieldset>
         {isThin ? (
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Virtualisation des postes Orange (VDI)</span>
-            <select name="vdiTier" value={vdi} onChange={(e) => setVdi(e.target.value)} className="h-10 rounded border border-slate-300 px-2">
+          <label className="flex flex-col gap-2 text-sm">
+            <span className={section}>Virtualisation des postes Orange (VDI)</span>
+            <Select name="vdiTier" value={vdi} onChange={(e) => setVdi(e.target.value)} className="sm:max-w-xs">
               <option value="STANDARD">VDI Standard</option>
               <option value="PERFORMANCE">VDI Performance</option>
-            </select>
+            </Select>
           </label>
         ) : (
           <input type="hidden" name="vdiTier" value="AUCUN" />
         )}
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="insurance" checked={assurance} onChange={(e) => setAssurance(e.target.checked)} className="h-5 w-5" /> Assurance casse/vol incluse
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Quantité (postes)</span>
-          <input type="number" name="quantity" min={1} max={500} value={qte} onChange={(e) => setQte(Math.max(1, Number(e.target.value) || 1))} className="h-10 w-32 rounded border border-slate-300 px-2" aria-label="Quantité" />
+        <Check name="insurance" checked={assurance} onChange={setAssurance} label="Assurance casse / vol incluse" hint="Mensualisée, reversée à l’assureur." />
+        <label className="flex flex-col gap-2 text-sm">
+          <span className={section}>Quantité (postes)</span>
+          <Input type="number" name="quantity" min={1} max={500} value={qte} onChange={(e) => setQte(Math.max(1, Number(e.target.value) || 1))} className="w-32" aria-label="Quantité" />
         </label>
         {accessories.length ? (
-          <fieldset className="flex flex-col gap-1 text-sm">
-            <legend className="font-medium">Accessoires (par poste)</legend>
-            {accessories.map((a) => (
-              <label key={a.sku} className="flex items-center gap-2">
-                <input type="checkbox" name="acc" value={a.sku} checked={acc.includes(a.sku)} onChange={(e) => setAcc(e.target.checked ? [...acc, a.sku] : acc.filter((x) => x !== a.sku))} className="h-5 w-5" /> {a.name}
-              </label>
-            ))}
+          <fieldset className="flex flex-col gap-2 text-sm">
+            <legend className={cn(section, 'mb-2.5')}>Accessoires (par poste)</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {accessories.map((a) => (
+                <Check key={a.sku} name="acc" value={a.sku} checked={acc.includes(a.sku)} onChange={(on) => setAcc(on ? [...acc, a.sku] : acc.filter((x) => x !== a.sku))} label={a.name} />
+              ))}
+            </div>
           </fieldset>
         ) : null}
         {children}
       </div>
-      <aside className="sticky top-12 h-fit rounded-xl border-2 border-primary/30 bg-white p-4 shadow-sm" aria-live="polite" data-testid="mensualite">
-        <p className="text-xs uppercase tracking-wide text-slate-500">Votre mensualité</p>
-        <p className="mt-1 text-2xl font-bold text-primary" data-testid="mensualite-poste">{res ? fcfa(res.perSeatTtc) : '…'}</p>
-        <p className="text-xs text-slate-500">TTC / mois / poste, tout compris</p>
-        {res && qte > 1 ? <p className="mt-2 text-sm">Total : <strong>{fcfa(res.totalTtc)}</strong> TTC / mois</p> : null}
-        <button type="button" className="mt-2 text-xs text-primary underline" onClick={() => setOpen(!open)} aria-expanded={open}>
+      <aside className="h-fit rounded-2xl bg-neutral-900 p-6 text-white shadow-pop lg:sticky lg:top-24" aria-live="polite" data-testid="mensualite">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-neutral-400">Votre mensualité</p>
+        <p className="mt-2 text-[34px] font-semibold leading-none tracking-tight tabular-nums" data-testid="mensualite-poste">{res ? fcfa(res.perSeatTtc) : '…'}</p>
+        <p className="mt-2 text-xs text-neutral-400">TTC / mois / poste, tout compris</p>
+        {res && qte > 1 ? (
+          <p className="mt-4 border-t border-white/10 pt-4 text-sm text-neutral-300">
+            Total pour {qte} postes : <strong className="text-white">{fcfa(res.totalTtc)}</strong> TTC / mois
+          </p>
+        ) : null}
+        <button type="button" className="mt-4 text-xs font-medium text-neutral-300 underline-offset-4 hover:text-white hover:underline" onClick={() => setOpen(!open)} aria-expanded={open}>
           {open ? 'Masquer le détail' : 'Voir le détail'}
         </button>
         {open && res ? (
-          <dl className="mt-2 space-y-1 text-xs">
-            <div className="flex justify-between"><dt>Loyer matériel HT</dt><dd>{fcfa(res.detail.loyerMaterielHt)}</dd></div>
-            <div className="flex justify-between"><dt>Services SOLINK HT</dt><dd>{fcfa(res.detail.servicesSolinkHt)}</dd></div>
-            <div className="flex justify-between"><dt>Services Orange HT</dt><dd>{fcfa(res.detail.servicesOrangeHt)}</dd></div>
-            <div className="flex justify-between"><dt>Assurance HT</dt><dd>{fcfa(res.detail.assuranceHt)}</dd></div>
-            <div className="flex justify-between"><dt>TVA</dt><dd>{fcfa(res.detail.tva)}</dd></div>
+          <dl className="mt-3 space-y-1.5 border-t border-white/10 pt-3 text-xs text-neutral-300">
+            {[
+              ['Loyer matériel HT', res.detail.loyerMaterielHt],
+              ['Services SOLINK HT', res.detail.servicesSolinkHt],
+              ['Services Orange HT', res.detail.servicesOrangeHt],
+              ['Assurance HT', res.detail.assuranceHt],
+              ['TVA', res.detail.tva],
+            ].map(([k, v]) => (
+              <div key={String(k)} className="flex justify-between gap-4">
+                <dt>{k}</dt>
+                <dd className="tabular-nums text-white">{fcfa(Number(v))}</dd>
+              </div>
+            ))}
           </dl>
         ) : null}
-        {res ? <p className="mt-2 text-xs">Total du contrat : {fcfa(res.contractTtc)} TTC sur {duree} mois</p> : null}
-        <p className="mt-3 text-xs text-slate-500">Équipements propriété de {financer}, restitués en fin de contrat.</p>
-        <Badge tone="warning" className="mt-2">Valeurs de démo</Badge>
+        {res ? <p className="mt-4 text-xs text-neutral-400">Total du contrat : <span className="text-neutral-200">{fcfa(res.contractTtc)}</span> TTC sur {duree} mois</p> : null}
+        <p className="mt-3 text-xs leading-relaxed text-neutral-500">Équipements propriété de {financer}, restitués en fin de contrat.</p>
+        <DemoBadge className="mt-4 border-white/20 text-neutral-400" />
       </aside>
     </div>
   );

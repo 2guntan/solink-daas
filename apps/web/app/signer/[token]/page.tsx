@@ -54,7 +54,7 @@ export default async function Page({ params }: { params: Promise<{ token: string
             </CardContent>
           </Card>
         ) : null}
-        <Link href={actor.orgType === 'FINANCEUR' ? `/banque/dossiers/${c.orderId}` : `/client/commandes/${c.orderId}/signature`} className="text-sm">← Retour</Link>
+        <Link href={actor.orgType === 'FINANCEUR' ? `/banque/dossiers/${c.orderId}` : `/client/commandes/${c.orderId}/signature`} className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← Retour</Link>
       </div>
     </main>
   );

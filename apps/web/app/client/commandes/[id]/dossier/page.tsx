@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const ex = (d.extraction ?? null) as { fields?: { key: string; label: string; value: string; confidence: number }[]; confirmed?: boolean } | null;
     const canUpload = editable && d.status !== 'VALIDEE' && (o.status !== 'PIECES_COMPLEMENTAIRES' || d.origin === 'DEMANDE_BANQUE' || d.status === 'A_REPRENDRE');
     return (
-      <li key={d.id} id={`piece-${d.id}`} className="rounded-lg border p-3" data-testid={`piece-${d.type}`}>
+      <li key={d.id} id={`piece-${d.id}`} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4" data-testid={`piece-${d.type}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="font-medium">{d.label}{d.origin === 'DEMANDE_BANQUE' ? <Badge tone="warning" className="ml-2">Demandée par la banque</Badge> : null}</p>
           <DocStatusBadge status={d.status} />
@@ -61,7 +61,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         {d.status === 'NON_APPLICABLE' ? <p className="text-sm text-slate-500">Non applicable : {d.naJustification}</p> : null}
         {d.fileId ? <a href={`/api/files/${d.fileId}`} target="_blank" className="text-sm">Voir la pièce (v{d.version})</a> : null}
         {ex?.fields?.length ? (
-          <div className="mt-2 rounded bg-slate-50 p-2 text-xs">
+          <div className="mt-2 rounded-lg bg-neutral-50 p-3 text-xs">
             <p className="font-medium">Champs extraits (OCR) {ex.confirmed ? <Badge tone="success">confirmés</Badge> : <Badge tone="info">à confirmer</Badge>}</p>
             <ul>{ex.fields.map((f) => <li key={f.key}>{f.label} : <strong>{f.value}</strong> <span className="text-slate-400">({Math.round(f.confidence * 100)} %)</span></li>)}</ul>
             {!ex.confirmed && editable ? <ActionForm action={confirmExtractionAction} hidden={{ documentId: d.id }} submit="Confirmer ces champs" size="sm" variant="secondary" /> : null}
@@ -82,16 +82,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   };
   return (
     <div className="flex flex-col gap-4">
-      <Link href={`/client/commandes/${o.id}`} className="text-sm">← Commande {o.ref}</Link>
+      <Link href={`/client/commandes/${o.id}`} className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← Commande {o.ref}</Link>
       <PageHeader title="Dossier de financement" description={`Checklist ${cf.checklistVersion} · version scellée v${cf.version}`} />
       {!editable ? <Alert tone="info" title="Dossier scellé">Le dossier est en cours de traitement ; il n’est plus modifiable à ce stade.</Alert> : null}
       <Card>
-        <CardContent className="grid gap-3 pt-4 sm:grid-cols-5" data-testid="progression">
-          {BLOCKS.map((b) => (
-            <a key={b.key} href={`#bloc-${b.key}`} className="no-underline">
-              <p className="text-xs text-slate-600">{b.label}</p>
+        <CardContent className="grid gap-4 pt-5 sm:grid-cols-5 sm:pt-6" data-testid="progression">
+          {BLOCKS.map((b, i) => (
+            <a key={b.key} href={`#bloc-${b.key}`} className="flex flex-col gap-2 no-underline hover:no-underline">
+              <p className="flex items-baseline justify-between gap-2 text-xs">
+                <span className="font-medium text-neutral-700"><span className="font-mono text-neutral-400">0{i + 1}</span> {b.label}</span>
+                <span className="tabular-nums text-neutral-500">{comp[b.key]} %</span>
+              </p>
               <Progress value={comp[b.key]} tone={comp[b.key] === 100 ? 'success' : 'primary'} />
-              <p className="text-xs text-slate-500">{comp[b.key]} %</p>
             </a>
           ))}
         </CardContent>

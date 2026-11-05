@@ -9,11 +9,11 @@ export function DemoSwitcher({ accounts, current, action }: { accounts: { email:
   const groups = [...new Set(accounts.map((a) => a.group))];
   return (
     <label className="flex items-center gap-2 text-xs">
-      <span className="hidden sm:inline">Compte :</span>
+      <span className="hidden text-neutral-500 sm:inline">Compte</span>
       <select
         data-testid="demo-switch"
         aria-label="Changer de compte de démo"
-        className="max-w-[210px] rounded border border-amber-400 bg-white px-1 py-1 text-xs text-slate-900 sm:max-w-xs"
+        className="ui-select h-7 max-w-[210px] rounded-md border border-white/10 bg-white/[0.06] pl-2 text-xs text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 sm:max-w-xs"
         value={current ?? ''}
         disabled={pending}
         onChange={(e) => {
@@ -25,13 +25,13 @@ export function DemoSwitcher({ accounts, current, action }: { accounts: { email:
           });
         }}
       >
-        <option value="">— choisir —</option>
+        <option value="" className="text-neutral-900">— choisir —</option>
         {groups.map((g) => (
-          <optgroup key={g} label={g}>
+          <optgroup key={g} label={g} className="text-neutral-900">
             {accounts
               .filter((a) => a.group === g)
               .map((a) => (
-                <option key={a.email} value={a.email}>
+                <option key={a.email} value={a.email} className="text-neutral-900">
                   {a.label}
                 </option>
               ))}

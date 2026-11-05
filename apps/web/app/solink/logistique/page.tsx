@@ -21,7 +21,7 @@ export default async function Page() {
           <CardContent className="flex flex-col gap-2">
             {o.status === 'EN_PREPARATION' ? <ActionForm action={shipAction} hidden={{ orderId: o.id }} submit="Expédier tous les sites" size="sm" testId={`expedier-${o.ref}`} /> : null}
             {o.deliveries.map((d) => (
-              <div key={d.id} className="flex flex-col gap-2 rounded border p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div key={d.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <span>{d.site.name} · créneau {date(d.slot)} · <Badge>{d.status}</Badge> {d.pv ? <Badge tone={d.pv.status === 'SIGNE' ? 'success' : 'warning'}>PV {d.pv.status === 'SIGNE' ? 'signé' : 'à signer'}</Badge> : null}</span>
                 {d.status === 'EXPEDIEE' ? <ActionForm action={deliveredAction} hidden={{ deliveryId: d.id }} submit="Marquer livré" size="sm" variant="secondary" testId={`livrer-${d.site.name}`} /> : null}
               </div>

@@ -25,7 +25,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         <CardContent className="flex flex-col gap-2">
           {locks.length === 0 ? <p className="text-sm text-slate-500">Aucun ordre en cours.</p> : null}
           {locks.map((l) => (
-            <div key={l.id} className="flex flex-col gap-2 rounded border p-3 text-sm md:flex-row md:items-center md:justify-between">
+            <div key={l.id} className="flex flex-col gap-2 rounded-xl border border-neutral-200/80 bg-white p-4 text-sm md:flex-row md:items-center md:justify-between">
               <span>{l.contract.order.organisation.name} — {l.contract.ref} — {l.reason} — <Badge tone={l.status === 'ORDONNE' ? 'danger' : 'warning'}>{l.status === 'PROPOSE' ? 'proposé à la banque (attente décision)' : l.status === 'ORDONNE' ? `ordonné par la banque ${dateTime(l.orderedAt)}` : `exécuté ${dateTime(l.executedAt)}`}</Badge></span>
               {l.status === 'ORDONNE' ? <ActionForm action={executeLockAction} hidden={{ lockOrderId: l.id }} submit="Exécuter le verrouillage MDM" variant="destructive" size="sm" confirm="Verrouiller tous les équipements actifs du contrat (ordre banque reçu) ?" reason="Référence de l’ordre / commentaire" testId="executer-verrouillage" /> : null}
             </div>

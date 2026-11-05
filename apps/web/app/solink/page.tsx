@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { prisma, type OrderStatus } from '@solink/db';
 import { STATUS_INFO, fcfa, now } from '@solink/core';
-import { Card, PageHeader, Stat } from '@solink/ui';
+import { Card, CardContent, CardHeader, CardTitle, PageHeader, Stat } from '@solink/ui';
 import { requireActor } from '@/lib/session';
 import { ListView } from '@/components/list-view';
 import { OrderStatusBadge } from '@/components/status';
@@ -30,7 +30,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         <Stat label="À acheter / livrer" value={by(['PRET_POUR_ACHAT', 'ACHETE', 'EN_PREPARATION', 'EXPEDIE', 'PV_A_SIGNER'])} />
         <Stat label="Enveloppe disponible" value={env ? fcfa(env.total - env.reserved - env.consumed) : '—'} />
       </div>
-      <Card className="p-4"><PipelineChart data={counts} /></Card>
+      <Card>
+        <CardHeader><CardTitle>Commandes par état</CardTitle></CardHeader>
+        <CardContent><PipelineChart data={counts} /></CardContent>
+      </Card>
       <ListView
         rows={orders}
         rowKey={(o) => o.id}

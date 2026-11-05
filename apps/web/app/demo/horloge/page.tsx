@@ -30,7 +30,7 @@ export default async function Page() {
           <CardContent>
             <ul className="space-y-2 text-xs">
               {runs.map((r) => (
-                <li key={r.id} className="rounded bg-slate-50 p-2 font-mono">{dateTime(r.at)} — {JSON.stringify(r.result)}</li>
+                <li key={r.id} className="rounded-lg bg-neutral-50 p-3 font-mono">{dateTime(r.at)} — {JSON.stringify(r.result)}</li>
               ))}
             </ul>
           </CardContent>

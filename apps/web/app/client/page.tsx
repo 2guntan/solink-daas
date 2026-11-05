@@ -22,7 +22,7 @@ export default async function Page() {
   const canSeePrices = !actor.roles.every((r) => ['CLIENT_RECEPTION', 'CLIENT_EMPLOYE'].includes(r));
   return (
     <div className="flex flex-col gap-5">
-      <PageHeader title="Bonjour" description="Votre tableau de bord" actions={<Link href="/client/catalogue" className={buttonVariants()}>Nouvelle commande</Link>} />
+      <PageHeader title={`Bonjour ${actor.name.split(' ')[0]}`} description="Votre tableau de bord" actions={<Link href="/client/catalogue" className={buttonVariants()}>Nouvelle commande</Link>} />
       {next ? <NextActionBanner a={next} /> : <EmptyState title="Aucune commande en cours" description="Parcourez le catalogue pour configurer vos postes." action={<Link href="/client/catalogue" className={buttonVariants()}>Voir le catalogue</Link>} />}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Postes actifs" value={devices} />
@@ -31,14 +31,17 @@ export default async function Page() {
         <Stat label="Commandes" value={orders.length} />
       </div>
       <Card>
-        <CardHeader><CardTitle>Mes commandes</CardTitle></CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardHeader className="flex-row items-baseline justify-between">
+          <CardTitle>Mes commandes</CardTitle>
+          <Link href="/client/commandes" className="text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900">Tout voir →</Link>
+        </CardHeader>
+        <CardContent className="flex flex-col divide-y divide-neutral-100">
           {orders.length === 0 ? <EmptyState title="Aucune commande" /> : null}
           {orders.map((o) => (
-            <div key={o.id} className="flex flex-col gap-2 border-b pb-3 last:border-0">
+            <div key={o.id} className="flex flex-col gap-4 py-5 first:pt-2 last:pb-0">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <Link href={`/client/commandes/${o.id}`} className="font-medium">{o.ref}</Link>
-                <div className="flex items-center gap-2"><OrderStatusBadge status={o.status} />{canSeePrices ? <span className="text-sm">{fcfa(o.monthlyTtc)} / mois</span> : null}</div>
+                <Link href={`/client/commandes/${o.id}`} className="text-[15px] font-semibold tracking-tight text-neutral-900 no-underline hover:underline">{o.ref}</Link>
+                <div className="flex items-center gap-3"><OrderStatusBadge status={o.status} />{canSeePrices ? <span className="text-sm font-medium tabular-nums">{fcfa(o.monthlyTtc)} <span className="font-normal text-neutral-500">/ mois</span></span> : null}</div>
               </div>
               <Timeline status={o.status} transitions={o.transitions} />
             </div>

@@ -1,10 +1,58 @@
+@import '@fontsource-variable/inter';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html { -webkit-text-size-adjust: 100%; }
-body { @apply bg-slate-50 text-slate-900 antialiased; }
-table { @apply w-full text-sm; }
-th { @apply text-left font-medium text-slate-500 whitespace-nowrap; }
-a { @apply text-primary; }
-:focus-visible { outline-color: theme('colors.primary.DEFAULT'); }
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+  }
+  body {
+    @apply bg-background font-sans text-neutral-900 antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  h1, h2, h3, h4 { @apply tracking-tight; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  a { @apply text-accent underline-offset-[3px] transition-colors duration-150; }
+  a:hover { @apply underline; }
+  strong { @apply font-semibold; }
+  code { @apply rounded-md bg-neutral-100 px-1.5 py-0.5 font-mono text-[0.85em] text-neutral-800; }
+  hr { @apply border-neutral-200; }
+  :focus-visible { @apply outline-none ring-2 ring-accent/60 ring-offset-2 ring-offset-white; }
+  ::selection { @apply bg-accent/15; }
+
+  /* Tableaux : lignes fines, en-têtes discrets — s'applique aussi aux tableaux écrits à la main dans les pages. */
+  table { @apply w-full border-collapse text-sm; }
+  th { @apply whitespace-nowrap text-left text-xs font-medium text-neutral-500; }
+  thead th { @apply border-b border-neutral-200 pb-2; }
+  tbody tr + tr { @apply border-t border-neutral-100; }
+  tbody tr.border-t { @apply border-neutral-100; }
+  td { @apply py-2 align-top; }
+
+  /* Contrôles natifs. */
+  input[type='checkbox'], input[type='radio'] { @apply h-[18px] w-[18px] shrink-0 cursor-pointer accent-neutral-900; }
+  input[type='checkbox'] { @apply rounded; }
+  select { @apply cursor-pointer; }
+  input[type='number']::-webkit-inner-spin-button { opacity: 0.4; }
+  ::placeholder { @apply text-neutral-400; }
+}
+
+@layer components {
+  /* Chevron des <select> (sans plugin forms). */
+  .ui-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='%2386868b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.65rem center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding-right: 2.25rem;
+  }
+  /* Masque les barres de défilement horizontales des navigations tout en gardant le défilement. */
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  /* Grille suisse : cellules blanches séparées par des filets de 1 px. */
+  .hairline-grid { @apply grid gap-px overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200; }
+  .hairline-grid > * { @apply bg-white; }
+}

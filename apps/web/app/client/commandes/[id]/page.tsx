@@ -122,7 +122,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <CardHeader><CardTitle>Messagerie avec votre chargé de dossier SOLINK</CardTitle></CardHeader>
         <CardContent className="flex flex-col gap-2">
           {o.messages.length === 0 ? <p className="text-sm text-slate-500">Aucun message.</p> : null}
-          {o.messages.map((m) => <div key={m.id} className={`rounded p-2 text-sm ${m.authorOrg === 'CLIENT' ? 'bg-primary/5' : 'bg-slate-100'}`}><span className="text-xs text-slate-500">{authors.find((a) => a.id === m.authorId)?.firstName} · {dateTime(m.at)}</span><p>{m.body}</p></div>)}
+          {o.messages.map((m) => (
+            <div key={m.id} className={`flex flex-col gap-1 ${m.authorOrg === 'CLIENT' ? 'items-end' : 'items-start'}`}>
+              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.authorOrg === 'CLIENT' ? 'rounded-br-md bg-neutral-900 text-white' : 'rounded-bl-md bg-neutral-100 text-neutral-900'}`}>{m.body}</div>
+              <span className="px-1 text-[11px] text-neutral-400">{authors.find((a) => a.id === m.authorId)?.firstName} · {dateTime(m.at)}</span>
+            </div>
+          ))}
           <ActionForm action={messageAction} hidden={{ orderId: o.id }} submit="Envoyer" size="sm"><Textarea name="body" required aria-label="Message" placeholder="Votre message…" /></ActionForm>
         </CardContent>
       </Card>

@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const decision = o.creditFile?.decisions[0];
   return (
     <div className="flex flex-col gap-4">
-      <Link href="/banque/file" className="text-sm">← File d’instruction</Link>
+      <Link href="/banque/file" className="inline-flex w-fit items-center gap-1 text-[13px] font-medium text-neutral-500 no-underline hover:text-neutral-900 hover:no-underline">← File d’instruction</Link>
       <PageHeader title={`Dossier ${o.ref.replace('CMD', 'FR')} — ${o.organisation.name}`} description={<span className="flex flex-wrap items-center gap-2"><OrderStatusBadge status={o.status} internal /> {SEGMENT_LABEL[o.organisation.segment ?? '']} · {o.apporteur ? `apporté par ${o.apporteur.name}` : 'direct'} {o.sampled ? <Badge tone="warning">échantillon contrôle a posteriori</Badge> : null}</span>} />
       <Card>
         <CardHeader><CardTitle>Financement demandé</CardTitle></CardHeader>
