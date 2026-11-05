@@ -13,8 +13,13 @@ Dernière mise à jour : 05/11/2026.
 - **J7 — Portails** : parc client, tickets, fin de contrat + restitution A–E + pénalités, Portail Orange (leads + invitation pré-remplie, apports sans pièces, commissions, export), Portail Refinanceur (portefeuille éligible, CSV), tableaux de bord F01/F10/B01 (Recharts), pg-boss (`scheduler-tick`).
 - **J8 — Durcissement** : 4 scénarios E2E Playwright, listes avec recherche / filtres / tri / pagination / états vides, pages d'erreur, responsive mobile, README, DECISIONS.
 
+## Vérifications (définition de « terminé »)
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (35 tests unitaires) : verts.
+- `pnpm test:e2e` : **4/4 verts** — impayé → relances → verrouillage J+15 → régularisation ; accord automatique ; pièce à reprendre + pièces complémentaires (DFS v2 + différentiel) ; parcours complet (connexion → … → facture Orange 2 lignes → encaissement ventilé, écart 0).
+- Les 5 portails sont peuplés par le seed ; README complet (installation Docker / Postgres local, comptes, scénarios pas à pas, simulations).
+
 ## Reste
-- Voir l'état des E2E dans la PR ; aucune fonctionnalité du périmètre §8 non implémentée connue.
+- Rien dans le périmètre §8. Pistes P2 : RLS PostgreSQL, pagination SQL, décaissement partiel, adaptateurs réels.
 
 ## Bugs connus / limites
 - Filtrage des listes en mémoire (volumes de démo) ; RLS PostgreSQL en P2 (cloisonnement appliqué dans chaque requête).
