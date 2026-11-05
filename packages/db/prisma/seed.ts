@@ -124,6 +124,7 @@ async function main() {
     ['analyste@banque-demo.sn', 'Adama', 'Touré (DÉMO)', 'Analyste crédit', 'bank', ['BANQUE_ANALYSTE']],
     ['valideur@banque-demo.sn', 'Sokhna', 'Niang (DÉMO)', 'Valideur N2', 'bank', ['BANQUE_VALIDEUR', 'BANQUE_RISK']],
     ['tresorerie@banque-demo.sn', 'Mamadou', 'Camara (DÉMO)', 'Trésorerie', 'bank', ['BANQUE_TRESORERIE']],
+    ['api@banque-demo.sn', 'API', 'Banque Pilote (compte technique)', 'Intégration SI', 'bank', ['BANQUE_ANALYSTE', 'BANQUE_VALIDEUR', 'BANQUE_TRESORERIE']],
     ['commercial@orange-demo.sn', 'Astou', 'Lo (DÉMO)', 'Commerciale grands comptes', 'orange', ['ORANGE_COMMERCIAL']],
     ['facturation@orange-demo.sn', 'Modou', 'Diagne (DÉMO)', 'Facturation', 'orange', ['ORANGE_FACTURATION']],
     ['refi@fonds-demo.org', 'Claire', 'Kouassi (DÉMO)', 'Chargée d’investissement', 'refi', ['REFINANCEUR_LECTURE']],

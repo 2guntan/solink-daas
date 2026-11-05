@@ -123,7 +123,7 @@ export async function startCeremony(ctx: Ctx, orderId: string, method: MandateMe
   const needed = order.organisation.jointSignature ? 2 : 1;
   if (sigMembers.length < needed) throw new BusinessError('SIGNATAIRES_INSUFFISANTS', `${needed} signataires habilités requis`);
   const clientSigners = sigMembers.slice(0, needed);
-  const bank = await ctx.db.membership.findFirst({ where: { organisationId: order.financerId, roles: { has: 'BANQUE_VALIDEUR' } }, include: { user: true } });
+  const bank = await ctx.db.membership.findFirst({ where: { organisationId: order.financerId, roles: { has: 'BANQUE_VALIDEUR' }, user: { NOT: { email: { startsWith: 'api@' } } } }, include: { user: true }, orderBy: { createdAt: 'asc' } });
   if (!bank) throw new BusinessError('DELEGATAIRE_ABSENT', 'Aucun délégataire banque');
   const contract = order.contract!;
   await ctx.db.mandate.update({ where: { contractId: contract.id }, data: { method } });
