@@ -24,7 +24,7 @@ test('accord automatique dans l’enveloppe (Teranga)', async ({ page }) => {
   await page.goto(`/solink/commandes/${id}`);
   await act(page, 'valider-tout');
   await act(page, 'terminer-precontrole');
-  await expect(page.getByRole('status').filter({ hasText: 'accord automatique' })).toBeVisible();
+  await expect(page.getByTestId('score')).toContainText('voie AUTO');
   await expectStatus(page, 'OFFRE_EMISE');
   await expect(page.getByTestId('journal')).toContainText('Accord automatique — règle BANQUE_PILOTE-ACCORD-AUTO-v1');
 

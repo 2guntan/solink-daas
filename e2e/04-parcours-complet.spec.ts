@@ -29,7 +29,7 @@ test('parcours complet (PME Ndar, instruction analyste)', async ({ page }) => {
   await page.goto(`/solink/commandes/${id}`);
   await act(page, 'valider-tout');
   await act(page, 'terminer-precontrole');
-  await expect(page.getByRole('status').filter({ hasText: 'instruction analyste' })).toBeVisible();
+  await expect(page.getByTestId('score')).toContainText('voie ANALYSTE');
   await expectStatus(page, 'TRANSMIS_FINANCEUR');
 
   // 5. Décision banque (analyste) avec confirmation + motif
