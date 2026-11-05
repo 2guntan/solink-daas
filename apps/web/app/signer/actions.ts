@@ -3,6 +3,7 @@
 import { appUrl } from '@solink/adapters';
 import { SYSTEM, svc } from '@solink/core';
 import { prisma } from '@solink/db';
+import { redirect } from 'next/navigation';
 import { act, requestMeta, str, type ActionResult } from '@/lib/action';
 
 export async function sendSignOtpAction(_: ActionResult | null, f: FormData) {
@@ -35,5 +36,5 @@ export async function signAction(_: ActionResult | null, f: FormData): Promise<A
   }
   if (!delivered) await svc.run(SYSTEM, (ctx) => svc.handleEsignEvent(ctx, JSON.parse(body)));
   const orderId = signer.ceremony.contract.orderId;
-  return { ok: true, message: 'Document(s) signé(s).', redirect: signer.role === 'BANQUE' ? `/banque/dossiers/${orderId}` : `/client/commandes/${orderId}/signature` };
+  redirect(signer.role === 'BANQUE' ? `/banque/dossiers/${orderId}` : `/client/commandes/${orderId}/signature`);
 }
